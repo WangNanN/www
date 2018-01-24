@@ -3,20 +3,20 @@ Imports System
 Imports System.IO
 Imports System.Text
 
-Namespace IP
-    Class IP
+Namespace IPExt
+    Class IPExt
         Public Shared Sub Main(ByVal args As String())
             IP.EnableFileWatch = True
-            IP.Load("17monipdb.dat")
+            IP.Load("17monipdb.datx")
 
-            Console.WriteLine(String.Join("\n", IP.Find("8.8.8.8")))
-            Console.WriteLine(String.Join("\n", IP.Find("255.255.255.255")))
+            Console.WriteLine(String.Join("\n", IPExt.Find("8.8.8.8")))
+            Console.WriteLine(String.Join("\n", IPExt.Find("255.255.255.255")))
             Console.Read()
         End Sub
 
         Private Shared EnableFileWatch As Boolean = False
         Private Shared offset As UInteger
-        Private Shared index As UInteger() = New UInteger(256) {}
+        Private Shared index As UInteger() = New UInteger(65536) {}
         Private Shared dataBuffer As Byte()
         Private Shared indexBuffer As Byte()
         Private Shared lastModifyTime As Long = 0L
@@ -34,22 +34,22 @@ Namespace IP
         Public Shared Function Find(ByVal ip As String) As String()
             SyncLock lock
                 Dim ips = ip.Split("."c)
-                Dim ip_prefix_value = Integer.Parse(ips(0))
+                Dim ip_prefix_value = Integer.Parse(ips(0)) * 256 + Integer.Parse(ips(1))
                 Dim ip2long_value As Long = BytesToLong(Byte.Parse(ips(0)), Byte.Parse(ips(1)), Byte.Parse(ips(2)), Byte.Parse(ips(3)))
                 Dim start = index(ip_prefix_value)
-                Dim max_comp_len = offset - 1028
+                Dim max_comp_len = offset - 262144 - 4
                 Dim index_offset As long = -1
                 Dim index_length = -1
                 Dim b As Byte = 0
-                For start = start * 8 + 1024 To max_comp_len - 1 Step 8
+                For start = start * 9 + 262144 To max_comp_len - 1 Step 9
                     If BytesToLong(indexBuffer(start + 0), indexBuffer(start + 1), indexBuffer(start + 2), indexBuffer(start + 3)) > ip2long_value Then
                         index_offset = BytesToLong(b, indexBuffer(start + 6), indexBuffer(start + 5), indexBuffer(start + 4))
-                        index_length = 255 And indexBuffer(start + 7)
+                        index_length = (255 And indexBuffer(start + 7) << 8) + indexBuffer(start + 8)
                         Exit For
                     End If
                 Next
                 Dim areaBytes = New Byte(index_length) {}
-                Array.Copy(dataBuffer, offset + CInt(index_offset) - 1024, areaBytes, 0, index_length)
+                Array.Copy(dataBuffer, offset + CInt(index_offset) - 262144, areaBytes, 0, index_length)
                 Return Encoding.UTF8.GetString(areaBytes).Split("\t")
             End SyncLock
         End Function
@@ -84,8 +84,10 @@ Namespace IP
                     Array.Copy(dataBuffer, 4, indexBuffer, 0, indexLength)
                     offset = CInt(indexLength)
 
-                    For [loop] = 0 To 256 - 1
-                        index([loop]) = BytesToLong(indexBuffer([loop] * 4 + 3), indexBuffer([loop] * 4 + 2), indexBuffer([loop] * 4 + 1), indexBuffer([loop] * 4))
+                    For i = 0 To 256 - 1
+                        For j = 0 To 256 - 1
+                            index(i * 256 + j) = BytesToLong(indexBuffer((i * 256 + j) * 4 + 3), indexBuffer((i * 256 + j) * 4 + 2), indexBuffer((i * 256 + j) * 4 + 1), indexBuffer((i * 256 + j) * 4))
+                        Next
                     Next
                 Catch ex As Exception
                     Throw ex
