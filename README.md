@@ -1,10 +1,11 @@
-Visual Basic.NET（根据官方C#版转写）
+Visual Basic.NET
 ====
+根据[官方C#版](https://github.com/17mon/csharp)转写
 
-17mon IP库解析代码VB.NET版
+17mon IP库解析代码VB.NET版，数据库请到[ipip.net](https://www.ipip.net)下载
 
-##基本用法
-```vb
+## 基本用法
+```vbnet
 
 IP.EnableFileWatch = True '默认值为：false，如果为true将会检查ip库文件的变化自动reload数据
 
