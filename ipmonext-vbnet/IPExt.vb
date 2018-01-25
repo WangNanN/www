@@ -6,8 +6,8 @@ Imports System.Text
 Namespace IPExt
     Class IPExt
         Public Shared Sub Main(ByVal args As String())
-            IP.EnableFileWatch = True
-            IP.Load("17monipdb.datx")
+            IPExt.EnableFileWatch = True
+            IPExt.Load("17monipdb.datx")
 
             Console.WriteLine(String.Join("\n", IPExt.Find("8.8.8.8")))
             Console.WriteLine(String.Join("\n", IPExt.Find("255.255.255.255")))

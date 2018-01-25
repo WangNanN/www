@@ -11,7 +11,7 @@ Namespace IP
 
             Console.WriteLine(String.Join("\n", IP.Find("8.8.8.8")))
             Console.WriteLine(String.Join("\n", IP.Find("255.255.255.255")))
-            Console.Read()
+            Console.ReadKey(True)
         End Sub
 
         Private Shared EnableFileWatch As Boolean = False
