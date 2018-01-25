@@ -16,7 +16,7 @@ Namespace IP
 
         Private Shared EnableFileWatch As Boolean = False
         Private Shared offset As UInteger
-        Private Shared index As UInteger() = New UInteger(256) {}
+        Private Shared index As UInteger() = New UInteger(255) {}
         Private Shared dataBuffer As Byte()
         Private Shared indexBuffer As Byte()
         Private Shared lastModifyTime As Long = 0L
@@ -35,7 +35,8 @@ Namespace IP
             SyncLock lock
                 Dim ips = ip.Split("."c)
                 Dim ip_prefix_value = Integer.Parse(ips(0))
-                Dim ip2long_value As Long = BytesToLong(Byte.Parse(ips(0)), Byte.Parse(ips(1)), Byte.Parse(ips(2)), Byte.Parse(ips(3)))
+                Dim ip2long_value As Long = (BytesToLong(Byte.Parse(ips(0)), Byte.Parse(ips(1)), Byte.Parse(ips(2)), Byte.Parse(ips(3)))) - 1
+                '其实上面这个值为什么要减1也不太清楚，不过看了下倒是能对上了，也不再导致255.255.255.255弹出错
                 Dim start = index(ip_prefix_value)
                 Dim max_comp_len = offset - 1028
                 Dim index_offset As long = -1
