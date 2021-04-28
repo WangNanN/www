@@ -6,6 +6,7 @@ Imports System.Text
 Namespace IPExt
     Class IPExt
         Public Shared Sub Main(ByVal args As String())
+
             IPExt.EnableFileWatch = True
             IPExt.Load("17monipdb.datx")
 
